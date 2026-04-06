@@ -1,0 +1,28 @@
+# Python
+training/venv/
+training/data/raw/
+__pycache__/
+*.pyc
+
+# Models (large files - consider Git LFS)
+training/models/*.onnx
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# C#
+backend/**/bin/
+backend/**/obj/
+*.sln.docstates
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/build/
