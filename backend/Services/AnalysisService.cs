@@ -1,5 +1,0 @@
-
-namespace SignLearn.Api.Services {
-
-    
-}

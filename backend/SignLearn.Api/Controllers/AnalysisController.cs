@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
+using SignLearn.Api.Models;
+using SignLearn.Api.Services;
+
 namespace SignLearn.Api.Controllers
 {
     [Route("api/analysis")]
