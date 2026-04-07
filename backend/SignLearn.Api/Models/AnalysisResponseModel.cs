@@ -2,6 +2,7 @@ namespace SignLearn.Api.Models
 {
     public class SignAnalysisResponse
     {
-        public required float[] Landmarks { get; set; }
+        public required string RecognizedSign { get; set; }
+        public required float Confidence { get; set; }
     }
 }
