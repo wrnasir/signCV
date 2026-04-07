@@ -9,8 +9,8 @@ namespace SignLearn.Api.Services {
     {
         private readonly string _labelMapPath = Path.Combine("wwwroot", "models", "label_map.json");
         private readonly string _modelPath = Path.Combine("wwwroot", "models", "asl_classifier.onnx");
-        private Dictionary<int, string> _labelMap;
-        private InferenceSession _session;
+        private Dictionary<int, string> _labelMap = new();
+        private InferenceSession _session = null!;
 
         public AnalysisService()
         {
@@ -27,6 +27,12 @@ namespace SignLearn.Api.Services {
         {
             string json = File.ReadAllText(_labelMapPath);
             var rawMap = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+
+            if (rawMap == null)
+            {
+                throw new Exception("Failed to deserialize label map");
+            }
+
             _labelMap = rawMap.ToDictionary(k => int.Parse(k.Key), k => k.Value);
         }
 
