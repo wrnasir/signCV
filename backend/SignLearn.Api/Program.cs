@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
 builder.Services.AddSingleton<AnalysisService>();
 builder.Services.AddCors(options =>
 {
@@ -18,6 +19,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
+
+app.MapControllers(); // add after app.UseCors
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

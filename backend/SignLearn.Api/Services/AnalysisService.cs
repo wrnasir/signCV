@@ -59,8 +59,8 @@ namespace SignLearn.Api.Services {
             var predictedLabel = results.First().AsEnumerable<long>().First();
 
             // Get confidence scores per class
-            var probabilities = results.Last().AsEnumerable<float>().ToArray();
-            float confidence = probabilities.Max();
+            // var probabilities = results.Last().AsEnumerable<float>().ToArray();
+            // float confidence = probabilities.Max();
 
             // Look up the letter
             string recognizedSign = _labelMap[(int)predictedLabel];
@@ -69,7 +69,8 @@ namespace SignLearn.Api.Services {
             return new SignAnalysisResponse
             {
                 RecognizedSign = recognizedSign,
-                Confidence = confidence
+                //Confidence = confidence
+                Confidence = 1.0f  // hardcode for now
             };
         }
     }
