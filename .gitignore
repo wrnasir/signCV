@@ -1,11 +1,12 @@
 # Python
 training/venv/
-training/data/raw/
+training/data/
 __pycache__/
 *.pyc
 
 # Models (large files - consider Git LFS)
-training/models/*.onnx
+**/*.onnx
+
 
 # OS
 .DS_Store
