@@ -1,6 +1,6 @@
-namespace SignLearn.Api.Models
+namespace SignLearn.Api.DTOs
 {
-    public class SignAnalysisRequest
+    public class AnalysisRequest
     {
         public required float[] Landmarks { get; set; }
     }
