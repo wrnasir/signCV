@@ -21,33 +21,31 @@ const Play: React.FC = () => {
   const [currentLetterIndex, setCurrentLetterIndex] = useState<number>(0);
   const [letterStatuses, setLetterStatuses] = useState<('pending' | 'correct')[]>([]);
   const [streak, setStreak] = useState<number>(0);
-  const [skillLevel, setSkillLevel] = useState<number>(5);
+  const [skillLevel, setSkillLevel] = useState<number>(3);
   const [masteredSigns, setMasteredSigns] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [wordComplete, setWordComplete] = useState<boolean>(false);
   const [showHowToPlay, setShowHowToPlay] = useState<boolean>(true);
   const [prediction, setPrediction] = useState<string>('');
   const [confidence, setConfidence] = useState<number>(0);
-
-  const correctHoldCount = useRef<number>(0);
-  const HOLD_THRESHOLD = 8;
+  const [usedWords, setUsedWords] = useState<string[]>([]);
 
   const fetchChallenge = useCallback(async () => {
     setIsLoading(true);
     setWordComplete(false);
     setCurrentLetterIndex(0);
-    correctHoldCount.current = 0;
 
     try {
       const response = await fetch(`${BACKEND_URL}/api/challenge/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skillLevel, masteredSigns, streak })
+        body: JSON.stringify({ skillLevel, masteredSigns, streak, usedWords })
       });
 
       if (response.ok) {
         const data = await response.json();
         setChallenge(data);
+        setUsedWords(prev => [...prev, data.targetWord]);
         setLetterStatuses(new Array(data.targetWord.length).fill('pending'));
       }
     } catch (err) {
@@ -72,32 +70,24 @@ const Play: React.FC = () => {
     const targetLetter = challenge.targetWord[currentLetterIndex];
 
     if (predictedSign === targetLetter) {
-      correctHoldCount.current += 1;
+      setLetterStatuses(prev => {
+        const updated = [...prev];
+        updated[currentLetterIndex] = 'correct';
+        return updated;
+      });
 
-      if (correctHoldCount.current >= HOLD_THRESHOLD) {
-        correctHoldCount.current = 0;
+      const nextIndex = currentLetterIndex + 1;
 
-        setLetterStatuses(prev => {
-          const updated = [...prev];
-          updated[currentLetterIndex] = 'correct';
-          return updated;
-        });
+      if (nextIndex >= challenge.targetWord.length) {
+        setWordComplete(true);
+        setStreak(prev => prev + 1);
 
-        const nextIndex = currentLetterIndex + 1;
-
-        if (nextIndex >= challenge.targetWord.length) {
-          setWordComplete(true);
-          setStreak(prev => prev + 1);
-
-          const newMastered = new Set(masteredSigns);
-          challenge.targetWord.split('').forEach(letter => newMastered.add(letter));
-          setMasteredSigns(Array.from(newMastered));
-        } else {
-          setCurrentLetterIndex(nextIndex);
-        }
+        const newMastered = new Set(masteredSigns);
+        challenge.targetWord.split('').forEach(letter => newMastered.add(letter));
+        setMasteredSigns(Array.from(newMastered));
+      } else {
+        setCurrentLetterIndex(nextIndex);
       }
-    } else {
-      correctHoldCount.current = 0;
     }
   }, [challenge, currentLetterIndex, wordComplete, masteredSigns]);
 
@@ -152,20 +142,11 @@ const Play: React.FC = () => {
                 })}
               </div>
 
-              {/* Hint */}
-              <p className="text-sm text-muted leading-relaxed">
-                <span className="font-semibold text-gray-100">Hint:</span> {challenge.hint}
-              </p>
-
               {/* Current Prediction */}
               {prediction && !wordComplete && (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted">You're signing:</span>
-                  <span className={`font-display text-3xl font-bold transition-colors ${
-                    prediction === challenge.targetWord[currentLetterIndex]
-                      ? 'text-green-400'
-                      : 'text-red-400'
-                  }`}>
+                  <span className="font-display text-3xl font-bold text-gray-300">
                     {prediction}
                   </span>
                 </div>

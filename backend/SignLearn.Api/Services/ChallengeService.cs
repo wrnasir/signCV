@@ -30,7 +30,7 @@ namespace SignLearn.Api.Services
         public async Task<ChallengeResponse> GenerateChallenge(ChallengeRequest request)
         {
             int skillLevel = ClampSkillLevel(request.SkillLevel);
-            string prompt = BuildPrompt(skillLevel, request.MasteredSigns, request.Streak);
+            string prompt = BuildPrompt(skillLevel, request.MasteredSigns, request.Streak, request.UsedWords);
             string rawResponse = await _groqService.SendPrompt(prompt, SYSTEM_PROMPT);
             ChallengeResponse response = ParseResponse(rawResponse);
             return response;
@@ -51,7 +51,7 @@ namespace SignLearn.Api.Services
         /// <summary>
         /// Builds the prompt string for Groq based on user context.
         /// </summary>
-        private string BuildPrompt(int skillLevel, List<string> masteredSigns, int streak)
+        private string BuildPrompt(int skillLevel, List<string> masteredSigns, int streak, List<string> usedWords)
         {
             string masteredSection = masteredSigns.Count > 0
                 ? $"The student has mastered these signs: {string.Join(", ", masteredSigns)}. Incorporate these letters more often."
@@ -73,12 +73,17 @@ namespace SignLearn.Api.Services
                 _ => "Use complex words (6-8 letters). Include multiple difficult signs. Challenge the student."
             };
 
+            string usedSection = usedWords.Count > 0
+                ? $"Do NOT use any of these words, they have already been used: {string.Join(", ", usedWords)}"
+                : "";
+
             return $@"Generate a single word for an ASL spelling challenge.
                     Skill level: {skillLevel}/{MAX_SKILL}
                     Current streak: {streak} correct in a row
                     {masteredSection}
                     {streakSection}
                     {difficultyGuide}
+                    {usedSection}
 
                     Respond with ONLY this JSON format:
                     {{

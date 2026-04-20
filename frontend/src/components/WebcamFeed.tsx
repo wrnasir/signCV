@@ -16,7 +16,7 @@ const HAND_CONNECTIONS: [number, number][] = [
   [5, 9], [9, 13], [13, 17]
 ];
 
-const PREDICTION_INTERVAL_MS = 200;
+const PREDICTION_INTERVAL_MS = 1500;
 
 interface WebcamFeedProps {
   onPrediction?: (sign: string, confidence: number) => void;
@@ -31,6 +31,12 @@ const WebcamFeed: React.FC<WebcamFeedProps> = ({ onPrediction }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+
+  const onPredictionRef = useRef(onPrediction);
+
+  useEffect(() => {
+    onPredictionRef.current = onPrediction;
+  }, [onPrediction]);
 
   const initializeHandLandmarker = useCallback(async () => {
     try {
@@ -88,8 +94,8 @@ const WebcamFeed: React.FC<WebcamFeedProps> = ({ onPrediction }) => {
 
       if (response.ok) {
         const result = await response.json();
-        if (onPrediction) {
-          onPrediction(result.recognizedSign, result.confidence);
+        if (onPredictionRef.current) {
+          onPredictionRef.current(result.recognizedSign, result.confidence);
         }
       }
     } catch (err) {
