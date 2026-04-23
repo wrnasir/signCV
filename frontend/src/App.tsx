@@ -1,21 +1,20 @@
 import React from 'react';
-import WebcamFeed from './components/WebcamFeed';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Landing from './components/Landing';
+import Play from './components/Play';
 
 function App() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#1a1a2e',
-      color: '#ffffff',
-      fontFamily: 'sans-serif'
-    }}>
-      <h1 style={{ marginBottom: '20px' }}>SignLearn</h1>
-      <WebcamFeed />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-brand-900 text-gray-100 flex flex-col font-body">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/play" element={<Play />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

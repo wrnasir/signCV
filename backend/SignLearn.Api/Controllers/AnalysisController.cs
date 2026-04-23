@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-using SignLearn.Api.Models;
+using SignLearn.Api.DTOs;
 using SignLearn.Api.Services;
 
 namespace SignLearn.Api.Controllers
@@ -17,11 +17,11 @@ namespace SignLearn.Api.Controllers
         }
         
        [HttpPost]
-       public IActionResult Analysis([FromBody] SignAnalysisRequest req)
+       public IActionResult Analysis([FromBody] AnalysisRequest req)
         {
             try
             {
-                SignAnalysisResponse result = _analysisService.Analyze(req);
+                AnalysisResponse result = _analysisService.Analyze(req);
                 return Ok(result);
             }
             catch (Exception ex)

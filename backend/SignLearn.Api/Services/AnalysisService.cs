@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
-using SignLearn.Api.Models;
+using SignLearn.Api.DTOs;
 
 namespace SignLearn.Api.Services {
 
@@ -36,7 +36,7 @@ namespace SignLearn.Api.Services {
             _labelMap = rawMap.ToDictionary(k => int.Parse(k.Key), k => k.Value);
         }
 
-        public SignAnalysisResponse Analyze(SignAnalysisRequest req)
+        public AnalysisResponse Analyze(AnalysisRequest req)
         {
             if (req.Landmarks.Length != 63)
             {
@@ -66,7 +66,7 @@ namespace SignLearn.Api.Services {
             string recognizedSign = _labelMap[(int)predictedLabel];
 
             // Build and return response
-            return new SignAnalysisResponse
+            return new AnalysisResponse
             {
                 RecognizedSign = recognizedSign,
                 //Confidence = confidence

@@ -1,6 +1,6 @@
-namespace SignLearn.Api.Models
+namespace SignLearn.Api.DTOs
 {
-    public class SignAnalysisResponse
+    public class AnalysisResponse
     {
         public required string RecognizedSign { get; set; }
         public required float Confidence { get; set; }

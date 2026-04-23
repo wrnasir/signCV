@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<AnalysisService>();
+builder.Services.AddHttpClient<GroqService>();
+builder.Services.AddScoped<ChallengeService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
