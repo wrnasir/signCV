@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import WebcamFeed from '../components/WebcamFeed';
 import HowToPlayModal from '../components/HowToPlayModal';
 
@@ -21,13 +21,14 @@ const Play: React.FC = () => {
   const [currentLetterIndex, setCurrentLetterIndex] = useState<number>(0);
   const [letterStatuses, setLetterStatuses] = useState<('pending' | 'correct')[]>([]);
   const [streak, setStreak] = useState<number>(0);
-  const [skillLevel, setSkillLevel] = useState<number>(3);
+  // const [skillLevel, setSkillLevel] = useState<number>(3);
+  // will implement setskillevel with user auth
+  const skillLevel = 3;
   const [masteredSigns, setMasteredSigns] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [wordComplete, setWordComplete] = useState<boolean>(false);
   const [showHowToPlay, setShowHowToPlay] = useState<boolean>(true);
   const [prediction, setPrediction] = useState<string>('');
-  const [confidence, setConfidence] = useState<number>(0);
   const [usedWords, setUsedWords] = useState<string[]>([]);
 
   const fetchChallenge = useCallback(async () => {
@@ -53,7 +54,7 @@ const Play: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [skillLevel, masteredSigns, streak]);
+  }, [skillLevel, masteredSigns, streak, usedWords]);
 
   useEffect(() => {
     if (!showHowToPlay) {
@@ -63,7 +64,6 @@ const Play: React.FC = () => {
 
   const handlePrediction = useCallback((predictedSign: string, conf: number) => {
     setPrediction(predictedSign);
-    setConfidence(conf);
 
     if (!challenge || wordComplete) return;
 
