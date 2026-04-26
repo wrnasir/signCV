@@ -7,7 +7,6 @@ __pycache__/
 # Models (large files - consider Git LFS)
 **/*.onnx
 
-
 # OS
 .DS_Store
 Thumbs.db
@@ -27,3 +26,6 @@ backend/**/obj/
 frontend/node_modules/
 frontend/dist/
 frontend/build/
+
+# env
+.env

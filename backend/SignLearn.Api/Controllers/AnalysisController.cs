@@ -9,9 +9,9 @@ namespace SignLearn.Api.Controllers
     [ApiController]
     public class AnalysisController : ControllerBase
     {
-        private readonly AnalysisService _analysisService;
+        private readonly IAnalysisService _analysisService;
 
-        public AnalysisController(AnalysisService analysisService)
+        public AnalysisController(IAnalysisService analysisService)
         {
             _analysisService = analysisService;
         }
