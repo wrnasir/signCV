@@ -7,9 +7,9 @@ namespace SignLearn.Api.Services
     /// Generates ASL spelling challenges by building prompts
     /// and delegating LLM calls to GroqService.
     /// </summary>
-    public class ChallengeService
+    public class ChallengeService : IChallengeService
     {
-        private readonly GroqService _groqService;
+        private readonly IGroqService _groqService;
         private const int MIN_SKILL = 1;
         private const int MAX_SKILL = 10;
         private const int DEFAULT_SKILL = 3;
@@ -19,7 +19,7 @@ namespace SignLearn.Api.Services
         You generate words for students to practice spelling through sign language.
         You must respond with ONLY valid JSON, no markdown, no backticks, no explanation.";
 
-        public ChallengeService(GroqService groqService)
+        public ChallengeService(IGroqService groqService)
         {
             _groqService = groqService;
         }

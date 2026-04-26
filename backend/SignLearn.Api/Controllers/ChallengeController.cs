@@ -8,9 +8,9 @@ namespace SignLearn.Api.Controllers
     [ApiController]
     public class ChallengeController : ControllerBase
     {
-        private readonly ChallengeService _challengeService;
+        private readonly IChallengeService _challengeService;
 
-        public ChallengeController(ChallengeService challengeService)
+        public ChallengeController(IChallengeService challengeService)
         {
             _challengeService = challengeService;
         }

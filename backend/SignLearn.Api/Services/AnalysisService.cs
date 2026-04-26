@@ -5,7 +5,7 @@ using SignLearn.Api.DTOs;
 
 namespace SignLearn.Api.Services {
 
-    public class AnalysisService
+    public class AnalysisService : IAnalysisService
     {
         private readonly string _labelMapPath = Path.Combine("wwwroot", "models", "label_map.json");
         private readonly string _modelPath = Path.Combine("wwwroot", "models", "asl_classifier.onnx");
