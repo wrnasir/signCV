@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import WebcamFeed from '../components/WebcamFeed';
 import HowToPlayModal from '../components/HowToPlayModal';
 
-const BACKEND_URL = 'http://localhost:5000';
+import { BACKEND_URL } from '../config';
 
 interface Challenge {
   targetWord: string;

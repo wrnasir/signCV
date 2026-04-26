@@ -5,7 +5,7 @@ import {
   NormalizedLandmark
 } from '@mediapipe/tasks-vision';
 
-const BACKEND_URL = 'http://localhost:5000';
+import { BACKEND_URL } from '../config';
 
 const HAND_CONNECTIONS: [number, number][] = [
   [0, 1], [1, 2], [2, 3], [3, 4],
