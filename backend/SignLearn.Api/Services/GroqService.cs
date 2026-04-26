@@ -1,12 +1,13 @@
 using System.Text;
 using System.Text.Json;
+using SignLearn.Api.Exceptions;
 
 namespace SignLearn.Api.Services
 {
     /// <summary>
     /// Generic service to handle all HTTP communication with the Groq API.
     /// </summary>
-    public class GroqService
+    public class GroqService : IGroqService
     {
         private readonly HttpClient _client;
         private readonly string _apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY")
@@ -53,7 +54,7 @@ namespace SignLearn.Api.Services
             if (!response.IsSuccessStatusCode)
             {
                 var errorBody = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Groq API error ({response.StatusCode}): {errorBody}");
+                throw new GroqException((int)response.StatusCode, errorBody);
             }
 
             var responseBody = await response.Content.ReadAsStringAsync();
