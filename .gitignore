@@ -4,9 +4,6 @@ training/data/
 __pycache__/
 *.pyc
 
-# Models (large files - consider Git LFS)
-**/*.onnx
-
 # OS
 .DS_Store
 Thumbs.db
