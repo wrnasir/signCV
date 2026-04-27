@@ -28,7 +28,7 @@ TEST_SIZE = 0.2
 RANDOM_STATE = 42
 
 # Choose which model to train: "rf" (RandomForest) or "mlp" (Neural Net)
-MODEL_TYPE = "rf"
+MODEL_TYPE = "mlp"
 
 def load_data():
     """Load landmarks CSV and split into features/labels."""
