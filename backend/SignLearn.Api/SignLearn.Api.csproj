@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-  <Content Include="wwwroot\models\**" CopyToOutputDirectory="PreserveNewest" />
+  <Content Update="wwwroot\models\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
