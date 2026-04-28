@@ -5,7 +5,7 @@ import {
   NormalizedLandmark
 } from '@mediapipe/tasks-vision';
 
-import { BACKEND_URL } from '../config';
+import { predictSign } from '../services/analysisService';
 
 const HAND_CONNECTIONS: [number, number][] = [
   [0, 1], [1, 2], [2, 3], [3, 4],
@@ -41,17 +41,17 @@ const WebcamFeed: React.FC<WebcamFeedProps> = ({ onPrediction }) => {
   const initializeHandLandmarker = useCallback(async () => {
     try {
       const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/wasm'
       );
 
-      handLandmarkerRef.current = await HandLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath: '/hand_landmarker.task',
-          delegate: 'GPU'
-        },
-        runningMode: 'VIDEO',
-        numHands: 1
-      });
+    handLandmarkerRef.current = await HandLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: '/hand_landmarker.task',
+        delegate: 'GPU'
+      },
+      runningMode: 'VIDEO',
+      numHands: 1
+    });
 
       setIsLoading(false);
     } catch (err) {
@@ -86,17 +86,9 @@ const WebcamFeed: React.FC<WebcamFeedProps> = ({ onPrediction }) => {
     }
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/analysis`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ landmarks: flatLandmarks })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (onPredictionRef.current) {
-          onPredictionRef.current(result.recognizedSign, result.confidence);
-        }
+      const result = await predictSign(flatLandmarks);
+      if (onPredictionRef.current) {
+        onPredictionRef.current(result.recognizedSign, result.confidence);
       }
     } catch (err) {
       console.error('Prediction failed:', err);
