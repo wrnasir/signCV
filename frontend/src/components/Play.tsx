@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import WebcamFeed from '../components/WebcamFeed';
 import HowToPlayModal from '../components/HowToPlayModal';
 
-import { BACKEND_URL } from '../config';
+import { generateChallenge } from '../services/challengeService';
 
 interface Challenge {
   targetWord: string;
@@ -37,18 +37,10 @@ const Play: React.FC = () => {
     setCurrentLetterIndex(0);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/challenge/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skillLevel, masteredSigns, streak, usedWords })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setChallenge(data);
-        setUsedWords(prev => [...prev, data.targetWord]);
-        setLetterStatuses(new Array(data.targetWord.length).fill('pending'));
-      }
+      const data = await generateChallenge({ skillLevel, masteredSigns, streak, usedWords });
+      setChallenge(data);
+      setUsedWords(prev => [...prev, data.targetWord]);
+      setLetterStatuses(new Array(data.targetWord.length).fill('pending'));
     } catch (err) {
       console.error('Failed to fetch challenge:', err);
     } finally {
