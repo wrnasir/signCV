@@ -20,7 +20,7 @@
 
 ## About The Project
 
-[![SignLearn Screenshot][product-screenshot]](https://github.com/wrnasir/signCV)
+![SignLearn Screenshot](https://github.com/wrnasir/signCV/blob/wrnasir/readme/diagrams/SignLearn_Home.png?raw=true)
 
 SignLearn is a full-stack ASL (American Sign Language) learning platform that teaches users to sign through interactive, real-time webcam challenges. A custom-trained MLP neural network classifier recognizes 26 ASL alphabet signs at ~98% accuracy, while a Groq-powered LLM generates adaptive spelling challenges that scale to the user's skill level.
 
@@ -60,38 +60,7 @@ No video ever leaves the browser; MediaPipe extracts hand landmarks client-side 
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    React Frontend                        │
-│  ┌──────────┐    ┌───────────────┐    ┌──────────────┐  │
-│  │  Webcam   │───▶│  MediaPipe JS  │───▶│ Canvas Draw  │  │
-│  │  Stream   │    │  (Landmarks)   │    │ (Skeleton)   │  │
-│  └──────────┘    └──────┬────────┘    └──────────────┘  │
-│                         │ 63 floats                      │
-└─────────────────────────┼───────────────────────────────┘
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│                 C# ASP.NET Core Backend                  │
-│                                                          │
-│  ┌──────────────────┐    ┌─────────────────────────┐    │
-│  │ AnalysisService   │    │ ChallengeService         │    │
-│  │ (ONNX Runtime)    │    │ (Prompt Builder + Parser) │    │
-│  └──────────────────┘    └────────┬────────────────┘    │
-│                                   │                      │
-│                          ┌────────▼────────┐            │
-│                          │   GroqService    │            │
-│                          │  (Llama 3.1 8B)  │            │
-│                          └─────────────────┘            │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│              Python Training Pipeline                    │
-│  ┌────────────┐   ┌────────────┐   ┌────────────────┐  │
-│  │  87k Images │──▶│  MediaPipe  │──▶│  MLP Classifier │  │
-│  │  (Kaggle)   │   │  Landmarks  │   │  → ONNX Export  │  │
-│  └────────────┘   └────────────┘   └────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
+![diagram](https://github.com/wrnasir/signCV/blob/wrnasir/readme/diagrams/SignLearn_DataFlow.png?raw=true)
 
 
 ### Built With
@@ -130,62 +99,7 @@ No video ever leaves the browser; MediaPipe extracts hand landmarks client-side 
    docker compose up --build
    ```
 
-4. Open `http://localhost:3000` and start signing
-
-Backend runs on `http://localhost:5000`, frontend on `http://localhost:3000`.
-
-### Manual Setup (without Docker)
-
-<details>
-<summary>Click to expand</summary>
-
-**Prerequisites:** Python 3.10+, .NET 9 SDK, Node.js 18+
-
-**Training Pipeline** (optional — pretrained model included)
-```sh
-cd training
-pip install -r requirements.txt
-wget -O hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
-# Download dataset from https://www.kaggle.com/datasets/grassknoted/asl-alphabet
-# Extract to data/raw/asl_alphabet_train/
-python extract_landmarks.py
-python train_model.py
-python evaluate.py
-```
-
-**Backend**
-```sh
-cd backend/SignLearn.Api
-dotnet restore
-```
-
-Set your Groq API key in `Properties/launchSettings.json`:
-```json
-"environmentVariables": {
-  "GROQ_API_KEY": "your-key-here"
-}
-```
-
-```sh
-dotnet run
-```
-
-**Frontend** (new terminal)
-```sh
-cd frontend
-npm install
-cp ../training/hand_landmarker.task public/
-npm start
-```
-
-</details>
-
-### Running Tests
-
-```sh
-cd backend/SignLearn.Api.Tests
-dotnet test --verbosity normal
-```
+The backend runs on `http://localhost:5000` and frontend on `http://localhost:3000`.
 
 
 
