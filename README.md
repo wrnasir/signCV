@@ -1,165 +1,119 @@
-# 🤟 SignLearn — Learn ASL, One Sign at a Time
+<a id="readme-top"></a>
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-.NET%208-purple?logo=dotnet&logoColor=white)
-![React](https://img.shields.io/badge/React-TypeScript-blue?logo=react&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![Live Site](https://img.shields.io/website?url=https%3A%2F%2Fsignlearn-web.azurewebsites.net&label=Live%20Site&up_message=Online&down_message=Offline)](https://signlearn-web.azurewebsites.net)
+[![CI](https://github.com/wrnasir/signCV/actions/workflows/ci.yml/badge.svg)](https://github.com/wrnasir/signCV/actions/workflows/ci.yml)
+[![CD](https://github.com/wrnasir/signCV/actions/workflows/cd.yml/badge.svg)](https://github.com/wrnasir/signCV/actions/workflows/cd.yml)
 
-> *Breaking the communication barrier between the hearing and deaf communities — powered by computer vision and machine learning.*
 
-## 🌟 Highlights
 
-- **Real-time ASL recognition** — sign a letter, see it identified instantly on screen
-- **Custom-trained ML model** — 98% accuracy across 26 ASL alphabet signs, trained on 87k images
-- **No video leaves the browser** — MediaPipe runs client-side, sending only 500-byte landmark payloads to the backend
-- **Cross-platform inference** — model trained in Python, served in C# via ONNX Runtime
+<br />
+<div align="center">
+  <h1>🤟 SignLearn</h1>
 
-## ℹ️ Overview
+  <p align="center">
+    Learn ASL through real-time computer vision challenges. Powered by a custom-trained ML model and LLM-generated content.
+    <br />
+    <br />
+  </p>
+</div>
+    
 
-SignLearn is an AI-powered ASL (American Sign Language) learning platform that teaches users to sign through real-time webcam feedback. Point your camera at your hand, make a sign, and the system tells you what letter it sees — instantly.
+## About The Project
 
-Under the hood, a custom RandomForest classifier is trained on hand landmark geometry extracted from 87,000 ASL alphabet images using Google's MediaPipe. The trained model is exported to ONNX format and served by a C# ASP.NET Core backend, while a React frontend handles webcam capture, client-side hand tracking, and skeleton visualization — all in real time.
+![SignLearn Screenshot](https://github.com/wrnasir/signCV/blob/wrnasir/readme/diagrams/SignLearn_Home.png?raw=true)
 
-### System Architecture
+SignLearn is a full-stack ASL (American Sign Language) learning platform that teaches users to sign through interactive, real-time webcam challenges. A custom-trained MLP neural network classifier recognizes 26 ASL alphabet signs at ~98% accuracy, while a Groq-powered LLM generates adaptive spelling challenges that scale to the user's skill level.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    React Frontend                        │
-│  ┌──────────┐    ┌───────────────┐    ┌──────────────┐  │
-│  │  Webcam   │───▶│  MediaPipe JS  │───▶│ Canvas Draw  │  │
-│  │  Stream   │    │  (Landmarks)   │    │ (Skeleton)   │  │
-│  └──────────┘    └──────┬────────┘    └──────────────┘  │
-│                         │ 63 floats                      │
-└─────────────────────────┼───────────────────────────────┘
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│                 C# ASP.NET Core Backend                  │
-│  ┌──────────────┐    ┌─────────────────┐                │
-│  │  Analysis     │───▶│  ONNX Runtime    │                │
-│  │  Controller   │    │  (Inference)     │                │
-│  └──────────────┘    └────────┬────────┘                │
-│                               │ Predicted Sign           │
-│                               ▼                          │
-│                      ┌─────────────────┐                │
-│                      │   Label Map      │                │
-│                      │  { 0: "A", ... } │                │
-│                      └─────────────────┘                │
-└─────────────────────────────────────────────────────────┘
+No video ever leaves the browser; MediaPipe extracts hand landmarks client-side and sends only 500 bytes of coordinate data to the backend per prediction. The ML model was trained in Python on 87,000 images, exported to ONNX, and runs natively in C# via ONNX Runtime with zero Python dependency in production.
 
-┌─────────────────────────────────────────────────────────┐
-│              Python Training Pipeline                    │
-│  ┌────────────┐   ┌────────────┐   ┌────────────────┐  │
-│  │  87k Images │──▶│  MediaPipe  │──▶│  RandomForest   │  │
-│  │  (Kaggle)   │   │  Landmarks  │   │  → ONNX Export  │  │
-│  └────────────┘   └────────────┘   └────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
+## Core Features
 
-### Data Flow
+**ML Training Pipeline**
+* Extracts 21 hand landmarks (63 features) from 87k ASL images via MediaPipe HandLandmarker model
+* Trains an MLP neural network classifier (128-64-32 hidden layers, ~98% accuracy) on landmark geometry
+* Exports to ONNX format for cross-platform inference — bridges Python training to C# production
+* Supports both left and right hand detection via real-time x-coordinate mirroring
 
-| Step | Communication | Description |
-|------|--------------|-------------|
-| 1 | Webcam → MediaPipe JS | Browser captures video frames and extracts 21 hand landmarks client-side |
-| 2 | Frontend → Backend | 63 landmark coordinates (x, y, z × 21 points) sent via REST |
-| 3 | Backend → ONNX Runtime | Landmarks fed into trained model, returns predicted class index |
-| 4 | Backend → Frontend | Predicted ASL letter + confidence score returned as JSON |
+**ASL Recognition Backend**
+* Loads ONNX model as a singleton via ONNX Runtime
+* REST endpoint accepts 63-float landmark vectors and returns predicted sign
+* Service layer built on interfaces (`IAnalysisService`, `IGroqService`, `IChallengeService`) for testability and dependency injection
+* Input validation, custom exception hierarchy, and structured error responses
 
-### Technologies
+**LLM Challenge Engine**
+* GroqService wraps the Groq API (Llama 3.1 8B) as a generic prompt-response client
+* ChallengeService builds context-aware prompts factoring skill level, streak, mastered signs, and used word blacklist
+* Parses structured JSON from LLM responses with backtick stripping and case-insensitive deserialization
 
-| Category | Stack |
-|----------|-------|
-| ML Training | Python, scikit-learn, MediaPipe, ONNX |
-| Backend | C#, ASP.NET Core, ONNX Runtime |
-| Frontend | React, TypeScript, MediaPipe JS |
-| Model Format | ONNX (cross-platform) |
-| Dataset | [ASL Alphabet](https://www.kaggle.com/datasets/grassknoted/asl-alphabet) (87k images, 29 classes) |
+**Real-Time Frontend**
+* MediaPipe Hands JS runs landmark detection client-side at 30fps
+* Canvas overlay renders hand skeleton (21 landmarks + connections) on the webcam feed
+* Interactive game loop: LLM generates a word → user signs each letter → instant per-letter feedback → streak tracking
+* Built with React, TypeScript, and Tailwind CSS
 
-### ✍️ Authors
+**Testing & DevOps**
+* xUnit test suite with Moq — covers services and controllers
+* Dockerized backend and frontend with docker-compose for local development
+* GitHub Actions CI pipeline — runs tests and validates Docker builds on every push/PR
+* GitHub Actions CD pipeline — deploys to Azure App Service on merge to main
 
-**Waleed** — CS student & software developer. Building tools at the intersection of AI and accessibility.
-- [GitHub](https://github.com/your-username)
 
-## 🚀 Usage
+## Architecture
 
-Start both the backend and frontend, then open your browser and show your hand to the camera:
+![diagram](https://github.com/wrnasir/signCV/blob/wrnasir/readme/diagrams/SignLearn_DataFlow.png?raw=true)
 
-```
-# Terminal 1 — Backend
-cd backend/SignLearn.Api
-dotnet run
 
-# Terminal 2 — Frontend
-cd frontend
-npm start
-```
+### Built With
 
-Sign a letter and see it recognized in real time with a confidence score overlay.
+* [![Python][Python-badge]][Python-url]
+* [![CSharp][CSharp-badge]][CSharp-url]
+* [![React][React.js]][React-url]
+* [![TypeScript][TypeScript-badge]][TypeScript-url]
+* [![TailwindCSS][Tailwind-badge]][Tailwind-url]
+* [![Docker][Docker-badge]][Docker-url]
 
-## ⬇️ Installation
+
+
+## Getting Started
 
 ### Prerequisites
-- Python 3.10+
-- .NET 8 SDK
-- Node.js 18+
 
-### Training Pipeline (optional — pretrained model included)
-```bash
-cd training
-pip install -r requirements.txt
+* Docker
+* A [Groq API key](https://console.groq.com) (free tier)
 
-# Download MediaPipe model
-wget -O hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+### Installation
 
-# Download dataset from https://www.kaggle.com/datasets/grassknoted/asl-alphabet
-# Extract to data/raw/asl_alphabet_train/
+1. Clone the repo
+   ```sh
+   git clone https://github.com/wrnasir/signCV.git
+   cd signCV
+   ```
 
-python extract_landmarks.py   # ~30-60 min
-python train_model.py          # Trains + exports ONNX
-python evaluate.py             # Validates against test set
-```
+2. Create a `.env` file in the project root with your Groq API key
+   ```sh
+   echo "GROQ_API_KEY=your-key-here" > .env
+   ```
 
-### Backend
-```bash
-cd backend/SignLearn.Api
-dotnet restore
-dotnet run
-```
+3. Build and run
+   ```sh
+   docker compose up --build
+   ```
 
-### Frontend
-```bash
-cd frontend
-npm install
-cp ../training/hand_landmarker.task public/
-npm start
-```
+The backend runs on `http://localhost:5000` and frontend on `http://localhost:3000`.
 
-## 📊 Model Performance
 
-| Metric | Value |
-|--------|-------|
-| Overall Accuracy | ~98% |
-| Best Performing | Most letters at 0.97–0.99 |
-| Lowest Performing | M (0.91), N (0.91) |
-| Input Features | 63 (21 landmarks × 3 coordinates) |
-| Model Type | RandomForest (100 estimators) |
-| Export Format | ONNX |
 
-> M and N have the lowest accuracy because their hand shapes differ by only one finger position — a known challenge in ASL recognition.
-
-## 🗺️ Roadmap
-
-- [x] ML training pipeline (MediaPipe → RandomForest → ONNX)
-- [x] C# backend with ONNX Runtime inference
-- [x] React frontend with real-time hand tracking
-- [ ] User authentication (JWT)
-- [ ] Groq LLM integration for adaptive lesson generation
-- [ ] Student progress tracking (EF Core + SQL Server)
-- [ ] SignalR for WebSocket-based real-time predictions
-- [ ] Docker + GitHub Actions CI/CD
-- [ ] Azure deployment
-
-## 💭 Feedback and Contributing
-
-Found a bug or have a feature idea? [Open an issue](https://github.com/wrnasir/signcv/issues).
-
-Contributions are welcome — whether it's improving model accuracy, adding new sign support, or enhancing the UI.
+<!-- MARKDOWN LINKS & IMAGES -->
+[product-screenshot]: images/screenshot.png
+[Python-badge]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
+[Python-url]: https://python.org
+[CSharp-badge]: https://img.shields.io/badge/C%23-512BD4?style=for-the-badge&logo=dotnet&logoColor=white
+[CSharp-url]: https://dotnet.microsoft.com
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
+[TypeScript-badge]: https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white
+[TypeScript-url]: https://typescriptlang.org
+[Tailwind-badge]: https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white
+[Tailwind-url]: https://tailwindcss.com
+[Docker-badge]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white
+[Docker-url]: https://docker.com
