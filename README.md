@@ -20,7 +20,7 @@
 
 ## About The Project
 
-![SignLearn Screenshot](https://github.com/wrnasir/signCV/blob/wrnasir/readme/diagrams/SignLearn_Home.png?raw=true)
+![SignLearn Screenshot](https://github.com/wrnasir/signCV/blob/main/assets/SignLearn_Home.png?raw=true)
 
 SignLearn is a full-stack ASL (American Sign Language) learning platform that teaches users to sign through interactive, real-time webcam challenges. A custom-trained MLP neural network classifier recognizes 26 ASL alphabet signs at ~98% accuracy, while a Groq-powered LLM generates adaptive spelling challenges that scale to the user's skill level.
 
@@ -60,7 +60,7 @@ No video ever leaves the browser; MediaPipe extracts hand landmarks client-side 
 
 ## Architecture
 
-![diagram](https://github.com/wrnasir/signCV/blob/wrnasir/readme/diagrams/SignLearn_DataFlow.png?raw=true)
+![diagram](https://github.com/wrnasir/signCV/blob/main/assets/SignLearn_DataFlow.png?raw=true)
 
 
 ### Built With
