@@ -86,7 +86,8 @@ const Play: React.FC = () => {
     if (!showHowToPlay) {
       fetchChallenge();
     }
-  }, [showHowToPlay, fetchChallenge]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showHowToPlay]);
 
   useEffect(() => {
     if (!wordComplete) return;
