@@ -49,14 +49,9 @@ const Play: React.FC = () => {
       console.error('Failed to fetch challenge:', err);
     } finally {
       setIsLoading(false);
+      isFetching.current = false; 
     }
   }, [skillLevel, masteredSigns, streak, usedWords]);
-
-  useEffect(() => {
-    if (!showHowToPlay) {
-      fetchChallenge();
-    }
-  }, [showHowToPlay, fetchChallenge]);
 
   const handlePrediction = useCallback((predictedSign: string, conf: number) => {
     setPrediction(predictedSign);
@@ -86,6 +81,23 @@ const Play: React.FC = () => {
       }
     }
   }, [challenge, currentLetterIndex, wordComplete, masteredSigns]);
+
+  useEffect(() => {
+    if (!showHowToPlay) {
+      fetchChallenge();
+    }
+  }, [showHowToPlay, fetchChallenge]);
+
+  useEffect(() => {
+    if (!wordComplete) return;
+
+    const timer = setTimeout(() => {
+      fetchChallenge();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line
+  }, [wordComplete]);
 
   return (
     <div className="flex-1 flex items-center justify-center p-6 md:p-10">
@@ -149,19 +161,14 @@ const Play: React.FC = () => {
               )}
 
               {/* Word Complete */}
-              {wordComplete && (
-                <div className="flex flex-col items-center gap-4 pt-2">
-                  <span className="font-display text-xl font-bold text-green-400">
-                    Nice! 🎉
-                  </span>
-                  <button
-                    onClick={fetchChallenge}
-                    className="px-8 py-3 rounded-xl bg-brand-500 text-white font-semibold text-sm hover:-translate-y-0.5 transition-all shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40"
-                  >
-                    Next Word
-                  </button>
-                </div>
-              )}
+             {wordComplete && (
+              <div className="flex flex-col items-center gap-4 pt-2">
+                <span className="font-display text-xl font-bold text-green-400">
+                  Nice! 🎉
+                </span>
+                <span className="text-sm text-muted">Next word in 3...</span>
+              </div>
+            )}
             </>
           ) : null}
         </div>
