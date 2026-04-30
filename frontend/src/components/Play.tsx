@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import WebcamFeed from '../components/WebcamFeed';
 import HowToPlayModal from '../components/HowToPlayModal';
 
@@ -30,8 +30,12 @@ const Play: React.FC = () => {
   const [showHowToPlay, setShowHowToPlay] = useState<boolean>(true);
   const [prediction, setPrediction] = useState<string>('');
   const [usedWords, setUsedWords] = useState<string[]>([]);
+  const isFetching = useRef(false);
 
   const fetchChallenge = useCallback(async () => {
+    if (isFetching.current) return;
+    isFetching.current = true;
+
     setIsLoading(true);
     setWordComplete(false);
     setCurrentLetterIndex(0);
